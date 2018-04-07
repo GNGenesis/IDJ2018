@@ -1,12 +1,8 @@
 #ifndef MUSIC_H_
 #define MUSIC_H_
 
-//Make 2018/1
 #define INCLUDE_SDL_MIXER
 #include "SDL_include.h"
-
-//Make 2017/1
-/*#include "SDL_mixer.h"*/
 
 #include <string>
 

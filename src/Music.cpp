@@ -4,13 +4,13 @@ Music::Music() {
 	music = nullptr;
 }
 
-Music::Music(std::string file) {
-	music = nullptr;
+Music::Music(std::string file) : Music() {
 	Open(file);
 }
 
 Music::~Music() {
-	Mix_FreeMusic(music);
+	if(IsOpen())
+		Mix_FreeMusic(music);
 }
 
 void Music::Open(std::string file) {
@@ -22,11 +22,17 @@ void Music::Open(std::string file) {
 }
 
 void Music::Play(int times) {
-	Mix_PlayMusic(music, times);
+	if(Mix_PlayMusic(music, times) == -1) {
+		printf("Mix_PlayedMusic failed: %s\n", SDL_GetError());
+		exit(EXIT_FAILURE);
+	}
 }
 
 void Music::Stop(int msToStop) {
-	Mix_FadeOutMusic(msToStop);
+	if(!Mix_FadeOutMusic(msToStop)) {
+		printf("Mix_FadeOutMusic failed: %s\n", SDL_GetError());
+		exit(EXIT_FAILURE);
+	}
 }
 
 bool Music::IsOpen() {
