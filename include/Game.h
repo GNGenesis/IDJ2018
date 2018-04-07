@@ -1,12 +1,8 @@
 #ifndef GAME_H_
 #define GAME_H_
 
-//Make 2018/1
 #define INCLUDE_SDL
 #include "SDL_include.h"
-
-//Make 2017/1
-/*#include "SDL.h"*/
 
 #include "State.h"
 

@@ -52,7 +52,6 @@ Game::Game(std::string title, int width, int height) {
 		printf("SDL_CreateRenderer failed: %s\n", SDL_GetError());
 		exit(EXIT_FAILURE);
 	}
-	
 	state = new State();
 }
 
@@ -91,5 +90,5 @@ void Game::Run() {
 		SDL_RenderPresent(renderer);
 		SDL_Delay(33);
 	}
-	printf("Game Over");
+	printf("Game Over\n");
 }
