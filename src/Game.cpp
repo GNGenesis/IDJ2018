@@ -3,6 +3,7 @@
 #define INCLUDE_SDL_TTF
 
 #include "Game.h"
+#include "Resources.h"
 
 Game* Game::instance = nullptr;
 
@@ -57,6 +58,9 @@ Game::Game(std::string title, int width, int height) {
 
 Game::~Game() {
 	delete state;
+	Resources::ClearImages();
+	Resources::ClearMusics();
+	Resources::ClearSounds();
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	TTF_Quit();
@@ -64,6 +68,7 @@ Game::~Game() {
 	Mix_Quit();
 	IMG_Quit();
 	SDL_Quit();
+	printf("We have already cleaned it all up, you can go now.");
 }
 
 Game& Game::GetInstance() {
@@ -90,5 +95,5 @@ void Game::Run() {
 		SDL_RenderPresent(renderer);
 		SDL_Delay(33);
 	}
-	printf("Game Over\n");
+	printf("Game Over.\n");
 }

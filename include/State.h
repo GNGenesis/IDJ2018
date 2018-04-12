@@ -2,19 +2,24 @@
 #define STATE_H_
 
 #include "GameObject.h"
+#include "Music.h"
 #include "Sprite.h"
 #include "Sound.h"
 #include "Face.h"
-#include "Music.h"
+#include "TileMap.h"
+#include "TileSet.h"
 
 #include <vector>
 #include <memory>
 
 class State {
 private:
-	bool quitRequested;
-	std::vector<std::unique_ptr<GameObject>> objectArray;
 	Music music;
+	GameObject* bg;
+	GameObject* map;
+	TileSet* set;
+	std::vector<std::unique_ptr<GameObject>> objectArray;
+	bool quitRequested;
 
 public:
 	State();
