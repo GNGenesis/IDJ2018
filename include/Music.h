@@ -18,6 +18,7 @@ public:
 	void Play(int times = -1);
 	void Stop(int msToStop = 1500);
 	bool IsOpen();
+	bool IsPlaying();
 };
 
 #endif /* MUSIC_H_ */

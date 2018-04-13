@@ -3,21 +3,32 @@
 #include <stdlib.h>
 #include <time.h>
 
-State::State() : music(Music("assets/audio/stageState.ogg")) {
-	quitRequested = false;
+State::State() : music("assets/audio/stageState.ogg") {
 	objectArray = std::vector<std::unique_ptr<GameObject>>();
+	quitRequested = false;
+
 	GameObject* bg = new GameObject();
-	Component* bgSprite = new Sprite(*bg,"assets/img/ocean.jpg");
+	GameObject* map = new GameObject();
+	set = new TileSet(*map, "assets/img/tileSet.png",64,64);
+
+	Component* bgSprite = new Sprite(*bg, "assets/img/ocean.jpg");
 	bg->AddComponent(bgSprite);
+	bg->box = Rect();
 	objectArray.emplace_back(bg);
+
+	Component* tileMap = new TileMap(*map, set, "assets/map/tileMap.txt");
+	map->AddComponent(tileMap);
+	map->box = Rect();
+	objectArray.emplace_back(map);
+
 	music.Play();
 
 	srand(time(NULL));
 }
 
 State::~State() {
+	delete set;
 	objectArray.clear();
-	music.Stop(0);
 }
 
 void State::AddObject(int mouseX, int mouseY) {

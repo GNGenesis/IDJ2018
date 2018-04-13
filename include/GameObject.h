@@ -11,8 +11,8 @@ class Component;
 
 class GameObject {
 private:
-	bool isDead;
 	std::vector<std::unique_ptr<Component>> components;
+	bool isDead;
 
 public:
 	Rect box;

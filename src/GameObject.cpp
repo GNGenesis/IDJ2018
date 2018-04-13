@@ -2,9 +2,9 @@
 #include "Component.h"
 
 GameObject::GameObject() {
-	box = Rect();
-	isDead = false;
 	components = std::vector<std::unique_ptr<Component>>();
+	isDead = false;
+	box = Rect();
 }
 
 GameObject::~GameObject() {
