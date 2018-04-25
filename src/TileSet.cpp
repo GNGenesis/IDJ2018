@@ -12,8 +12,10 @@ TileSet::~TileSet() {
 }
 
 void TileSet::RenderTile(int index, int x, int y) {
-	if(index < rows*columns) {
-		tileSet.SetClip(tileWidth*(index%columns), tileHeight*(index/columns), tileWidth, tileHeight);
+	if(index > -1 && index < rows*columns) {
+		int clipX = tileWidth*(index%columns);
+		int clipY = tileHeight*(index/columns);
+		tileSet.SetClip(clipX, clipY, tileWidth, tileHeight);
 		tileSet.Render(x, y);
 	}
 }

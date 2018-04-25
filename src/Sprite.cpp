@@ -40,8 +40,8 @@ void Sprite::Update(float dt) {
 	
 }
 
-void Sprite::Render() {
-	Render(associated.box.x, associated.box.y);
+void Sprite::Render(Vec2 cameraPos) {
+	Render(associated.box.x-cameraPos.x, associated.box.y-cameraPos.y);
 }
 
 void Sprite::Render(int x, int y) {

@@ -3,10 +3,6 @@
 
 #include "GameObject.h"
 #include "Music.h"
-#include "Sprite.h"
-#include "Sound.h"
-#include "Face.h"
-#include "TileMap.h"
 #include "TileSet.h"
 
 #include <vector>
@@ -26,8 +22,7 @@ public:
 	~State();
 	void AddObject(int mouseX, int mouseY);
 	void LoadAssets();
-	void Input();
-	void Update(float dt = 0);
+	void Update(float dt);
 	void Render();
 	bool QuitRequested();
 };

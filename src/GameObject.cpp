@@ -2,7 +2,6 @@
 #include "Component.h"
 
 GameObject::GameObject() {
-	components = std::vector<std::unique_ptr<Component>>();
 	isDead = false;
 	box = Rect();
 }
@@ -37,9 +36,9 @@ void GameObject::Update(float dt) {
 		i->Update(dt);
 }
 
-void GameObject::Render() {
+void GameObject::Render(Vec2 cameraPos) {
 	for(auto& i: components)
-		i->Render();
+		i->Render(cameraPos);
 }
 
 bool GameObject::IsDead() {

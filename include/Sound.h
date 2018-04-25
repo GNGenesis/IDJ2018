@@ -21,7 +21,7 @@ public:
 	void Play(int times = 1);
 	void Stop();
 	void Update(float dt);
-	void Render();
+	void Render(Vec2 cameraPos);
 	bool Is(std::string type);
 	bool IsOpen();
 	bool IsPlaying();

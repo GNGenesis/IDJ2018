@@ -1,25 +1,29 @@
 #include "State.h"
+#include "InputManager.h"
+#include "Camera.h"
+
+#include "Sprite.h"
+#include "Sound.h"
+#include "Face.h"
+#include "TileMap.h"
+#include "CameraFollower.h"
 
 #include <stdlib.h>
 #include <time.h>
 
 State::State() : music("assets/audio/stageState.ogg") {
-	objectArray = std::vector<std::unique_ptr<GameObject>>();
 	quitRequested = false;
 
-	GameObject* bg = new GameObject();
-	GameObject* map = new GameObject();
-	set = new TileSet(*map, "assets/img/tileSet.png",64,64);
+	bg = new GameObject();
+	map = new GameObject();
+	set = new TileSet(*map, "assets/img/tileSet.png", 64, 64);
 
-	Component* bgSprite = new Sprite(*bg, "assets/img/ocean.jpg");
-	bg->AddComponent(bgSprite);
+	bg->AddComponent(new Sprite(*bg, "assets/img/ocean.jpg"));
+	bg->AddComponent(new CameraFollower(*bg));
 	bg->box = Rect();
-	objectArray.emplace_back(bg);
 
-	Component* tileMap = new TileMap(*map, set, "assets/map/tileMap.txt");
-	map->AddComponent(tileMap);
+	map->AddComponent(new TileMap(*map, set, "assets/map/tileMap.txt"));
 	map->box = Rect();
-	objectArray.emplace_back(map);
 
 	music.Play();
 
@@ -28,6 +32,8 @@ State::State() : music("assets/audio/stageState.ogg") {
 
 State::~State() {
 	delete set;
+	delete map;
+	delete bg;
 	objectArray.clear();
 }
 
@@ -46,52 +52,66 @@ void State::LoadAssets() {
 
 }
 
-void State::Input() {
-	SDL_Event event;
-	int mouseX, mouseY;
-	SDL_GetMouseState(&mouseX, &mouseY);
+void State::Update(float dt) {
+	quitRequested = InputManager::GetInstance().QuitRequested();
 
-	while(SDL_PollEvent(&event)) {
-		if(event.type == SDL_QUIT)
-			quitRequested = true;
-		
-		if(event.type == SDL_MOUSEBUTTONDOWN) {
-			for(int i = objectArray.size()-1; i >= 0; i--) {
-				GameObject* go = (GameObject*) objectArray[i].get();
-				if(go->box.Contains((float)mouseX, (float)mouseY)) {
-					Face* face = (Face*) go->GetComponent("Face");
-					if(face) {
-						if(!face->IsDead()) {
-							face->Damage(std::rand()%10 + 10);
-							break;
-						}
+	Camera::Update(dt);
+	bg->Update(dt);
+	map->Update(dt);
+	
+	if(InputManager::GetInstance().KeyPress(SPACE_KEY)) {
+		Vec2 objPos = InputManager::GetInstance().GetMousePos()+Vec2::Project(200, std::rand()%360);
+		AddObject(objPos.x, objPos.y);
+	}
+	
+	if(InputManager::GetInstance().MousePress(LEFT_MOUSE_BUTTON)) {
+		for(int i = objectArray.size()-1; i >= 0; i--) {
+			if(objectArray[i]->box.Contains(InputManager::GetInstance().GetMousePos())) {
+				Face* face = (Face*) objectArray[i]->GetComponent("Face");
+				if(face) {
+					if(!face->IsDead()) {
+						face->Damage(10+std::rand()%10);
+						break;
 					}
 				}
 			}
 		}
-		if(event.type == SDL_KEYDOWN) {
-			if(event.key.keysym.sym == SDLK_ESCAPE) {
-				quitRequested = true;
-			}else{
-				Vec2 objPos = Vec2(mouseX, mouseY) + Vec2::Project(200, std::rand()%360);
-				AddObject(objPos.x, objPos.y);
+	}
+
+	if(InputManager::GetInstance().MousePress(RIGHT_MOUSE_BUTTON)) {
+		for(int i = objectArray.size()-1; i >= 0; i--) {
+			if(objectArray[i]->box.Contains(InputManager::GetInstance().GetMousePos())) {
+				Face* face = (Face*) objectArray[i]->GetComponent("Face");
+				if(face) {
+					if(!face->IsDead()) {
+						Camera::Follow(objectArray[i].get());
+						break;
+					}
+				}
 			}
+		}
+	}
+	
+	for(auto& i: objectArray)
+		i->Update(dt);
+	
+	for(int i = objectArray.size()-1; i >= 0; i--) {
+		if(objectArray[i]->IsDead()) {
+			if(Camera::GetFocus() == objectArray[i].get())
+				Camera::Unfollow();
+			objectArray.erase(objectArray.begin()+i);
 		}
 	}
 }
 
-void State::Update(float dt) {
-	Input();
-	for(auto& i: objectArray)
-		i->Update(dt);
-	for(int i = objectArray.size()-1; i >= 0; i--)
-		if(objectArray[i]->IsDead())
-			objectArray.erase(objectArray.begin()+i);
-}
-
 void State::Render() {
+	TileMap* tileMap = (TileMap*) map->GetComponent("TileMap");
+	
+	bg->Render(Camera::pos);
+	tileMap->RenderLayer(0, Camera::pos.x, Camera::pos.y);
 	for(auto& i: objectArray)
-		i->Render();
+		i->Render(Camera::pos);
+	tileMap->RenderLayer(1, Camera::pos.x*1.5, Camera::pos.y*1.5);
 }
 
 bool State::QuitRequested() {

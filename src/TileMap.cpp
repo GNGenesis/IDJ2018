@@ -3,7 +3,6 @@
 #include <fstream>
 
 TileMap::TileMap(GameObject& associated, TileSet* tileSet, std::string file) : Component(associated) {
-	tileMatrix = std::vector<int>();
 	TileMap::tileSet = tileSet;
 	Load(file);
 }
@@ -41,15 +40,19 @@ void TileMap::Update(float dt) {
 	
 }
 
-void TileMap::Render() {
-	for(int i = mapDepth-1; i >= 0 ; i--)
-		RenderLayer(i);
+void TileMap::Render(Vec2 cameraPos) {
+	for(int i = 0; i < mapDepth; i++)
+		RenderLayer(i, cameraPos.x*(1+i*0.5), cameraPos.y*(1+i*0.5));
 }
 
 void TileMap::RenderLayer(int layer, int cameraX, int cameraY) {
-	for(int j = 0; j < mapHeight; j++)
-		for(int i = 0; i < mapWidth; i++)
-			tileSet->RenderTile(At(i, j, layer), i*tileSet->GetTileWidth(), j*tileSet->GetTileHeight());
+	for(int j = 0; j < mapHeight; j++) {
+		for(int i = 0; i < mapWidth; i++) {
+			int x = i*tileSet->GetTileWidth()-cameraX;
+			int y = j*tileSet->GetTileHeight()-cameraY;
+			tileSet->RenderTile(At(i, j, layer), x, y);
+		}
+	}
 }
 
 bool TileMap::Is(std::string type) {
@@ -57,7 +60,7 @@ bool TileMap::Is(std::string type) {
 }
 
 int TileMap::At(int x, int y, int z) {
-	return tileMatrix[x+y*(mapWidth)+z*(mapWidth*mapHeight)];
+	return tileMatrix[(x)+(y*mapWidth)+(z*mapWidth*mapHeight)];
 }
 
 int TileMap::GetWidth() {

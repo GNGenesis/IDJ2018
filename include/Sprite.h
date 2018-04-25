@@ -24,7 +24,7 @@ public:
 	void SetClip(int x, int y, int w, int h);
 	void Toggle();
 	void Update(float dt);
-	void Render();
+	void Render(Vec2 cameraPos);
 	void Render(int x, int y);
 	bool Is(std::string type);
 	int GetWidth();

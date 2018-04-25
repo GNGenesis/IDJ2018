@@ -21,7 +21,7 @@ public:
 	void Load(std::string file);
 	void SetTileSet(TileSet* tileSet);
 	void Update(float dt);
-	void Render();
+	void Render(Vec2 cameraPos);
 	void RenderLayer(int layer, int cameraX = 0, int cameraY = 0);
 	bool Is(std::string type);
 	int At(int x, int y, int z = 0);

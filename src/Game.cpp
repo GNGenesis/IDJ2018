@@ -4,6 +4,7 @@
 
 #include "Game.h"
 #include "Resources.h"
+#include "InputManager.h"
 
 Game* Game::instance = nullptr;
 
@@ -61,6 +62,7 @@ Game::~Game() {
 	Resources::ClearImages();
 	Resources::ClearMusics();
 	Resources::ClearSounds();
+	InputManager::GetInstance().~InputManager();
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	TTF_Quit();
@@ -73,7 +75,7 @@ Game::~Game() {
 
 Game& Game::GetInstance() {
 	if(!instance)
-		new Game("Gabriel Nazareno Halabi 15/0010290",1024,600);
+		new Game("Gabriel Nazareno Halabi 15/0010290", 1024, 600);
 	return *instance;
 }
 
@@ -85,12 +87,23 @@ State& Game::GetState() {
 	return *state;
 }
 
+void Game::CalculateDeltaTime() {
+	dt = SDL_GetTicks() - frameStart;
+	frameStart = frameStart + dt;
+}
+
+float Game::GetDeltaTime() {
+	return dt/1000;
+}
+
 void Game::Run() {
 	state->LoadAssets();
 	while(!state->QuitRequested()) {
+		CalculateDeltaTime();
 		if(SDL_RenderClear(renderer))
 			printf("SDL_RenderClear failed: %s\n", SDL_GetError());
-		state->Update();
+		InputManager::GetInstance().Update();
+		state->Update(GetDeltaTime());
 		state->Render();
 		SDL_RenderPresent(renderer);
 		SDL_Delay(33);

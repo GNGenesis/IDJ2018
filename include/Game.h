@@ -14,14 +14,18 @@ private:
 	SDL_Window* window;
 	SDL_Renderer* renderer;
 	State* state;
+	int frameStart;
+	float dt;
 
 	Game(std::string title, int width, int height);
+	void CalculateDeltaTime();
 
 public:
 	~Game();
 	static Game& GetInstance();
 	SDL_Renderer* GetRenderer();
 	State& GetState();
+	float GetDeltaTime();
 	void Run();
 };
 

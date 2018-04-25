@@ -24,7 +24,7 @@ public:
 	Component* GetComponent(std::string type);
 	void RequestDelete();
 	void Update(float dt) ;
-	void Render();
+	void Render(Vec2 cameraPos = Vec2());
 	bool IsDead();
 };
 

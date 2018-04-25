@@ -1,6 +1,11 @@
 #include "Face.h"
+#include "InputManager.h"
+
 #include "Sprite.h"
 #include "Sound.h"
+
+//#include <stdlib.h>
+//#include <time.h>
 
 Face::Face(GameObject& associated) : Component(associated) {
 	hitpoints = 30;
@@ -28,7 +33,7 @@ void Face::Update(float dt) {
 	}
 }
 
-void Face::Render() {
+void Face::Render(Vec2 cameraPos) {
 
 }
 

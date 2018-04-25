@@ -14,7 +14,7 @@ public:
 	~Face();
 	void Damage(int damage);
 	void Update(float dt);
-	void Render();
+	void Render(Vec2 cameraPos);
 	bool Is(std::string type);
 	bool IsDead();
 };

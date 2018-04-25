@@ -21,3 +21,11 @@ Rect::~Rect() {
 bool Rect::Contains(float a, float b) {
 	return((a > x) && (a < x+w) && (b > y) && (b < y+h));
 }
+
+bool Rect::Contains(Vec2 p) {
+	return((p.x > x) && (p.x < x+w) && (p.y > y) && (p.y < y+h));
+}
+
+Vec2 Rect::GetCenter() {
+	return Vec2(x+(w/2),y+(h/2));
+}
