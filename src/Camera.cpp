@@ -16,22 +16,22 @@ void Camera::Unfollow() {
 
 void Camera::Update(float dt) {
 	if(!focus) {
-		if(InputManager::GetInstance().IsKeyDown(UP_ARROW_KEY))
+		if(InputManager::IsKeyDown(UP_ARROW_KEY))
 			pos.y -= speed.y*dt;
-		if(InputManager::GetInstance().IsKeyDown(DOWN_ARROW_KEY))
+		if(InputManager::IsKeyDown(DOWN_ARROW_KEY))
 			pos.y += speed.y*dt;
-		if(InputManager::GetInstance().IsKeyDown(LEFT_ARROW_KEY))
+		if(InputManager::IsKeyDown(LEFT_ARROW_KEY))
 			pos.x -= speed.x*dt;
-		if(InputManager::GetInstance().IsKeyDown(RIGHT_ARROW_KEY))
+		if(InputManager::IsKeyDown(RIGHT_ARROW_KEY))
 			pos.x += speed.x*dt;
 	}else{
-		if(InputManager::GetInstance().IsKeyDown(UP_ARROW_KEY))
+		if(InputManager::IsKeyDown(UP_ARROW_KEY))
 			focus->box.y -= speed.y*dt;
-		if(InputManager::GetInstance().IsKeyDown(DOWN_ARROW_KEY))
+		if(InputManager::IsKeyDown(DOWN_ARROW_KEY))
 			focus->box.y += speed.y*dt;
-		if(InputManager::GetInstance().IsKeyDown(LEFT_ARROW_KEY))
+		if(InputManager::IsKeyDown(LEFT_ARROW_KEY))
 			focus->box.x -= speed.x*dt;
-		if(InputManager::GetInstance().IsKeyDown(RIGHT_ARROW_KEY))
+		if(InputManager::IsKeyDown(RIGHT_ARROW_KEY))
 			focus->box.x += speed.x*dt;
 		int w, h;
 		SDL_GetRendererOutputSize(Game::GetInstance().GetRenderer(), &w, &h);

@@ -4,19 +4,21 @@
 
 #include "Sprite.h"
 #include "Sound.h"
-#include "Face.h"
 #include "TileMap.h"
 #include "CameraFollower.h"
+
+#include "Alien.h"
 
 #include <stdlib.h>
 #include <time.h>
 
 State::State() : music("assets/audio/stageState.ogg") {
+	started = false;
 	quitRequested = false;
 
 	bg = new GameObject();
 	map = new GameObject();
-	set = new TileSet(*map, "assets/img/tileSet.png", 64, 64);
+	set = new TileSet(*map, "assets/img/tileset.png", 64, 64);
 
 	bg->AddComponent(new Sprite(*bg, "assets/img/ocean.jpg"));
 	bg->AddComponent(new CameraFollower(*bg));
@@ -24,6 +26,11 @@ State::State() : music("assets/audio/stageState.ogg") {
 
 	map->AddComponent(new TileMap(*map, set, "assets/map/tileMap.txt"));
 	map->box = Rect();
+
+	GameObject* go = new GameObject();
+	go->AddComponent(new Alien(*go, 8));
+	go->box.SetPos(512-go->box.w/2, 300-go->box.h/2);
+	AddObject(go);
 
 	music.Play();
 
@@ -37,15 +44,26 @@ State::~State() {
 	objectArray.clear();
 }
 
-void State::AddObject(int mouseX, int mouseY) {
-	GameObject* go = new GameObject();
-	Sprite* sprite = new Sprite(*go, "assets/img/penguinface.png");
-	go->AddComponent(sprite);
-	go->AddComponent(new Sound(*go, "assets/audio/boom.wav"));
-	go->AddComponent(new Face(*go));
-	objectArray.emplace_back(go);
-	go->box = Rect(mouseX-sprite->GetWidth()/2, mouseY-sprite->GetHeight()/2,
-				   sprite->GetWidth(), sprite->GetHeight());
+void State::Start() {
+	LoadAssets();
+	for(unsigned i = 0; i < objectArray.size(); i++)
+		objectArray[i]->Start();
+	started = true;
+}
+
+std::weak_ptr<GameObject> State::AddObject(GameObject* go) {
+	std::shared_ptr<GameObject> shared = std::shared_ptr<GameObject>(go);
+	objectArray.push_back(shared);
+	if(started)
+		shared->Start();
+	return shared;
+}
+
+std::weak_ptr<GameObject> State::GetObjectPtr(GameObject* go) {
+	for(unsigned i = 0; i < objectArray.size(); i++)
+		if(objectArray[i].get() == go)
+			return objectArray[i];
+	return std::weak_ptr<GameObject>();
 }
 
 void State::LoadAssets() {
@@ -53,48 +71,18 @@ void State::LoadAssets() {
 }
 
 void State::Update(float dt) {
-	quitRequested = InputManager::GetInstance().QuitRequested();
+	quitRequested = InputManager::QuitRequested();
+	if(InputManager::KeyPress(ESCAPE_KEY))
+		quitRequested = true;
 
 	Camera::Update(dt);
 	bg->Update(dt);
 	map->Update(dt);
-	
-	if(InputManager::GetInstance().KeyPress(SPACE_KEY)) {
-		Vec2 objPos = InputManager::GetInstance().GetMousePos()+Vec2::Project(200, std::rand()%360);
-		AddObject(objPos.x, objPos.y);
-	}
-	
-	if(InputManager::GetInstance().MousePress(LEFT_MOUSE_BUTTON)) {
-		for(int i = objectArray.size()-1; i >= 0; i--) {
-			if(objectArray[i]->box.Contains(InputManager::GetInstance().GetMousePos())) {
-				Face* face = (Face*) objectArray[i]->GetComponent("Face");
-				if(face) {
-					if(!face->IsDead()) {
-						face->Damage(10+std::rand()%10);
-						break;
-					}
-				}
-			}
-		}
-	}
 
-	if(InputManager::GetInstance().MousePress(RIGHT_MOUSE_BUTTON)) {
-		for(int i = objectArray.size()-1; i >= 0; i--) {
-			if(objectArray[i]->box.Contains(InputManager::GetInstance().GetMousePos())) {
-				Face* face = (Face*) objectArray[i]->GetComponent("Face");
-				if(face) {
-					if(!face->IsDead()) {
-						Camera::Follow(objectArray[i].get());
-						break;
-					}
-				}
-			}
-		}
-	}
-	
-	for(auto& i: objectArray)
-		i->Update(dt);
-	
+	for(unsigned i = 0; i < objectArray.size(); i++)
+		if(objectArray[i]->IsActive())
+			objectArray[i]->Update(dt);
+
 	for(int i = objectArray.size()-1; i >= 0; i--) {
 		if(objectArray[i]->IsDead()) {
 			if(Camera::GetFocus() == objectArray[i].get())
@@ -107,10 +95,11 @@ void State::Update(float dt) {
 void State::Render() {
 	TileMap* tileMap = (TileMap*) map->GetComponent("TileMap");
 	
-	bg->Render(Camera::pos);
+	bg->Render();
 	tileMap->RenderLayer(0, Camera::pos.x, Camera::pos.y);
-	for(auto& i: objectArray)
-		i->Render(Camera::pos);
+	for(unsigned i = 0; i < objectArray.size(); i++)
+		if(objectArray[i]->IsActive())
+			objectArray[i]->Render();
 	tileMap->RenderLayer(1, Camera::pos.x*1.5, Camera::pos.y*1.5);
 }
 

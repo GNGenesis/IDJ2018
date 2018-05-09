@@ -40,9 +40,8 @@ void TileMap::Update(float dt) {
 	
 }
 
-void TileMap::Render(Vec2 cameraPos) {
-	for(int i = 0; i < mapDepth; i++)
-		RenderLayer(i, cameraPos.x*(1+i*0.5), cameraPos.y*(1+i*0.5));
+void TileMap::Render() {
+
 }
 
 void TileMap::RenderLayer(int layer, int cameraX, int cameraY) {

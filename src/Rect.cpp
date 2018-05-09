@@ -18,12 +18,36 @@ Rect::~Rect() {
 
 }
 
+void Rect::SetPos(float x, float y) {
+	Rect::x = x;
+	Rect::y = y;
+}
+
+void Rect::SetPos(Vec2 pos) {
+	x = pos.x;
+	y = pos.y;
+}
+
+void Rect::SetSize(float w, float h) {
+	Rect::w = w;
+	Rect::h = h;
+}
+
+void Rect::SetSize(Vec2 size) {
+	w = size.x;
+	h = size.y;
+}
+
 bool Rect::Contains(float a, float b) {
 	return((a > x) && (a < x+w) && (b > y) && (b < y+h));
 }
 
 bool Rect::Contains(Vec2 p) {
 	return((p.x > x) && (p.x < x+w) && (p.y > y) && (p.y < y+h));
+}
+
+Vec2 Rect::GetPos() {
+	return Vec2(x, y);
 }
 
 Vec2 Rect::GetCenter() {

@@ -1,15 +1,22 @@
 #include "Sprite.h"
 #include "Game.h"
 #include "Resources.h"
+#include "Camera.h"
 
 Sprite::Sprite(GameObject& associated) : Component(associated) {
 	texture = nullptr;
-	on = true;
 	width = 0;
 	height = 0;
+	scale = Vec2(1, 1);
+	frameCount = 1;
+	currentFrame = 0;
+	frameTime = 1;
+	timeElapsed = 0;
 }
 
-Sprite::Sprite(GameObject& associated, std::string file) : Sprite(associated) {
+Sprite::Sprite(GameObject& associated, std::string file, int frameCount, float frameTime) : Sprite(associated) {
+	Sprite::frameCount = frameCount;
+	Sprite::frameTime = frameTime;
 	Open(file);
 }
 
@@ -20,9 +27,9 @@ Sprite::~Sprite() {
 void Sprite::Open(std::string file) {
 	texture = Resources::GetImage(file);
 	SDL_QueryTexture(texture, nullptr, nullptr, &width, &height);
-	SetClip(0, 0, width, height);
-	associated.box.w = width;
-	associated.box.h = height;
+	SetClip(0, 0, (width/frameCount), height);
+	associated.box.w = GetWidth();
+	associated.box.h = GetHeight();
 }
 
 void Sprite::SetClip(int x, int y, int w, int h) {
@@ -32,27 +39,47 @@ void Sprite::SetClip(int x, int y, int w, int h) {
 	clipRect.h = h;
 }
 
-void Sprite::Toggle() {
-	on = !on;
+void Sprite::SetScale(Vec2 scale) {
+	Sprite::scale = scale;
+	associated.box.w = GetWidth();
+	associated.box.h = GetHeight();
+}
+
+void Sprite::SetFrame(int frame) {
+	currentFrame = frame;
+}
+
+void Sprite::SetFrameCount(int frameCount) {
+	Sprite::frameCount = frameCount;
+}
+
+void Sprite::SetFrameTime(float frameTime) {
+	Sprite::frameTime = frameTime;
 }
 
 void Sprite::Update(float dt) {
-	
+	timeElapsed += dt;
+	if(timeElapsed > frameTime) {
+		timeElapsed -= frameTime;
+		currentFrame += 1;
+		if(currentFrame > frameCount-1)
+			currentFrame = 0;
+		SetClip(currentFrame*(width/frameCount), 0, (width/frameCount), height);
+	}
 }
 
-void Sprite::Render(Vec2 cameraPos) {
-	Render(associated.box.x-cameraPos.x, associated.box.y-cameraPos.y);
+void Sprite::Render() {
+	Render(associated.box.x-Camera::pos.x, associated.box.y-Camera::pos.y);
 }
 
 void Sprite::Render(int x, int y) {
-	if(on) {
-		SDL_Rect dstRect = SDL_Rect();
-		dstRect.x = x;
-		dstRect.y = y;
-		dstRect.w = clipRect.w;
-		dstRect.h = clipRect.h;
-		SDL_RenderCopy(Game::GetInstance().GetRenderer(), texture, &clipRect, &dstRect);
-	}
+	SDL_Rect dstRect;
+	dstRect.x = x;
+	dstRect.y = y;
+	dstRect.w = (int)clipRect.w*scale.x;
+	dstRect.h = (int)clipRect.h*scale.y;
+	SDL_RenderCopyEx(Game::GetInstance().GetRenderer(), texture, &clipRect, &dstRect,
+					 associated.rotation, nullptr, SDL_FLIP_NONE);
 }
 
 bool Sprite::Is(std::string type) {
@@ -60,17 +87,17 @@ bool Sprite::Is(std::string type) {
 }
 
 int Sprite::GetWidth() {
-	return width;
+	return (int)(width/frameCount)*scale.x;
 }
 
 int Sprite::GetHeight() {
-	return height;
+	return (int)height*scale.y;
+}
+
+Vec2 Sprite::GetScale() {
+	return scale;
 }
 
 bool Sprite::IsOpen() {
 	return (!texture) ? false : true;
-}
-
-bool Sprite::IsOn() {
-	return on;
 }

@@ -12,25 +12,32 @@ class Sprite : public Component {
 private:
 	SDL_Texture* texture;
 	SDL_Rect clipRect;
-	bool on;
 	int width;
 	int height;
+	Vec2 scale;
+	int frameCount;
+	int currentFrame;
+	float frameTime;
+	float timeElapsed;
 
 public:
 	Sprite(GameObject& associated);
-	Sprite(GameObject& associated, std::string file);
+	Sprite(GameObject& associated, std::string file, int frameCount = 1, float frameTime = 1);
 	~Sprite();
 	void Open(std::string file);
 	void SetClip(int x, int y, int w, int h);
-	void Toggle();
+	void SetScale(Vec2 scale);
+	void SetFrame(int frame);
+	void SetFrameCount(int frameCount);
+	void SetFrameTime(float frameTime);
 	void Update(float dt);
-	void Render(Vec2 cameraPos);
+	void Render();
 	void Render(int x, int y);
 	bool Is(std::string type);
 	int GetWidth();
 	int GetHeight();
+	Vec2 GetScale();
 	bool IsOpen();
-	bool IsOn();
 };
 
 #endif /* SPRITE_H_ */

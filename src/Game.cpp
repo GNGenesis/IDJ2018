@@ -62,7 +62,6 @@ Game::~Game() {
 	Resources::ClearImages();
 	Resources::ClearMusics();
 	Resources::ClearSounds();
-	InputManager::GetInstance().~InputManager();
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	TTF_Quit();
@@ -97,12 +96,12 @@ float Game::GetDeltaTime() {
 }
 
 void Game::Run() {
-	state->LoadAssets();
+	state->Start();
 	while(!state->QuitRequested()) {
 		CalculateDeltaTime();
 		if(SDL_RenderClear(renderer))
 			printf("SDL_RenderClear failed: %s\n", SDL_GetError());
-		InputManager::GetInstance().Update();
+		InputManager::Update();
 		state->Update(GetDeltaTime());
 		state->Render();
 		SDL_RenderPresent(renderer);

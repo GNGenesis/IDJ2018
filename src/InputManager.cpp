@@ -1,27 +1,21 @@
 #include "InputManager.h"
 #include "Camera.h"
 
-InputManager::InputManager() {
-	mouseX = 0;
-	mouseY = 0;
-	updateCounter = 0;
-	quitRequested = false;
-}
-
-InputManager::~InputManager() {
-
-}
+std::unordered_map<int, bool> InputManager::keyState;
+std::unordered_map<int, int> InputManager::keyUpdate;
+bool InputManager::mouseState [6];
+int InputManager::mouseUpdate [6];
+int InputManager::mouseX;
+int InputManager::mouseY;
+int InputManager::updateCounter;
+bool InputManager::quitRequested = false;
 
 void InputManager::Update() {
 	SDL_Event event;
 	SDL_GetMouseState(&mouseX, &mouseY);
 	mouseX += Camera::pos.x;
 	mouseY += Camera::pos.y;
-
-	if(updateCounter < 100)
-		updateCounter++;
-	else
-		updateCounter = 0;
+	updateCounter++;
 
 	while(SDL_PollEvent(&event)) {
 		if(event.key.repeat != 1) {
@@ -85,9 +79,4 @@ Vec2 InputManager::GetMousePos() {
 
 bool InputManager::QuitRequested() {
 	return quitRequested;
-}
-
-InputManager& InputManager::GetInstance() {
-	static InputManager instance;
-	return instance;
 }

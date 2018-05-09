@@ -15,6 +15,12 @@ public:
 	Vec2 operator-(const float rhs) const;
 	Vec2 operator*(const Vec2& rhs) const;
 	Vec2 operator*(const float rhs) const;
+	float GetDX(float x);
+	float GetDY(float y);
+	float GetDS(Vec2 pos);
+	float GetCos(Vec2 pos);
+	float GetSin(Vec2 pos);
+	float GetAngle(Vec2 pos);
 	static float Cos(float ang);
 	static float Sin(float ang);
 	static Vec2 Project(float dist, float ang);

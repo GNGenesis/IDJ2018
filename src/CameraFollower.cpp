@@ -14,7 +14,7 @@ void CameraFollower::Update(float dt) {
 	associated.box.y = Camera::pos.y;
 }
 
-void CameraFollower::Render(Vec2 cameraPos) {
+void CameraFollower::Render() {
 	
 }
 

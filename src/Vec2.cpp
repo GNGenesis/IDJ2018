@@ -42,6 +42,30 @@ Vec2 Vec2::operator*(const float rhs) const {
 	return Vec2(x * rhs, y * rhs);
 }
 
+float Vec2::GetDX(float x) {
+	return x-Vec2::x;
+}
+
+float Vec2::GetDY(float y) {
+	return y-Vec2::y;
+}
+
+float Vec2::GetDS(Vec2 pos) {
+	return pow(pow(GetDX(pos.x), 2)+pow(GetDY(pos.y), 2), 0.5);
+}
+
+float Vec2::GetCos(Vec2 pos) {
+	return GetDX(pos.x)/GetDS(pos);
+}
+
+float Vec2::GetSin(Vec2 pos) {
+	return GetDY(pos.y)/GetDS(pos);
+}
+
+float Vec2::GetAngle(Vec2 pos) {
+	return atan2(GetDY(pos.y), GetDX(pos.x))*(180/PI);
+}
+
 float Vec2::Cos(float ang) {
 	return cos(ang * PI/180);
 }

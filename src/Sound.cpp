@@ -37,7 +37,7 @@ void Sound::Update(float dt) {
 
 }
 
-void Sound::Render(Vec2 cameraPos) {
+void Sound::Render() {
 
 }
 
