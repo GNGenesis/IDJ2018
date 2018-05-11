@@ -25,6 +25,12 @@ void GameObject::AddComponent(Component* cpt) {
 		cpt->Start();
 }
 
+void GameObject::AddComponentAsFirst(Component* cpt) {
+	components.emplace(components.begin(), cpt);
+	if(started)
+		cpt->Start();
+}
+
 void GameObject::RemoveComponent(Component* cpt) {
 	for(int i = components.size()-1; i >= 0; i--)
 		if(components[i].get() == cpt)
@@ -52,6 +58,12 @@ void GameObject::Render() {
 	for(unsigned i = 0; i < components.size(); i++)
 		if(components[i]->IsActive())
 			components[i]->Render();
+}
+
+void GameObject::NotifyCollision(GameObject& other) {
+	for(unsigned i = 0; i < components.size(); i++)
+		if(components[i]->IsActive())
+			components[i]->NotifyCollision(other);
 }
 
 void GameObject::Activate() {

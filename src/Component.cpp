@@ -12,6 +12,10 @@ void Component::Start() {
 
 }
 
+void Component::NotifyCollision(GameObject& other) {
+
+}
+
 void Component::Activate() {
 	active = true;
 }

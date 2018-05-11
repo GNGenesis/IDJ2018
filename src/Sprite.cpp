@@ -12,11 +12,16 @@ Sprite::Sprite(GameObject& associated) : Component(associated) {
 	currentFrame = 0;
 	frameTime = 1;
 	timeElapsed = 0;
+	loop = true;
 }
 
-Sprite::Sprite(GameObject& associated, std::string file, int frameCount, float frameTime) : Sprite(associated) {
+Sprite::Sprite(GameObject& associated, std::string file, 
+			   int frameCount, float frameTime, bool loop, 
+			   float secondsToSelfDestruct) : Sprite(associated) {
 	Sprite::frameCount = frameCount;
 	Sprite::frameTime = frameTime;
+	Sprite::loop = loop;
+	Sprite::secondsToSelfDestruct = secondsToSelfDestruct;
 	Open(file);
 }
 
@@ -59,10 +64,16 @@ void Sprite::SetFrameTime(float frameTime) {
 
 void Sprite::Update(float dt) {
 	timeElapsed += dt;
+	if(secondsToSelfDestruct > 0) {
+		selfDestructCount.Update(dt);
+		if(selfDestructCount.Get() > secondsToSelfDestruct)
+			associated.RequestDelete();
+	}
 	if(timeElapsed > frameTime) {
 		timeElapsed -= frameTime;
-		currentFrame += 1;
-		if(currentFrame > frameCount-1)
+		if(currentFrame < frameCount-1)
+			currentFrame += 1;
+		else if(loop)
 			currentFrame = 0;
 		SetClip(currentFrame*(width/frameCount), 0, (width/frameCount), height);
 	}

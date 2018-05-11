@@ -24,11 +24,13 @@ public:
 	~GameObject();
 	void Start();
 	void AddComponent(Component* cpt);
+	void AddComponentAsFirst(Component* cpt);
 	void RemoveComponent(Component* cpt);
 	Component* GetComponent(std::string type);
 	void RequestDelete();
 	void Update(float dt) ;
 	void Render();
+	void NotifyCollision(GameObject& other);
 	void Activate();
 	void Deactivate();
 	bool IsActive();

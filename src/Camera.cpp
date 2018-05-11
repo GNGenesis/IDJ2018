@@ -25,14 +25,6 @@ void Camera::Update(float dt) {
 		if(InputManager::IsKeyDown(RIGHT_ARROW_KEY))
 			pos.x += speed.x*dt;
 	}else{
-		if(InputManager::IsKeyDown(UP_ARROW_KEY))
-			focus->box.y -= speed.y*dt;
-		if(InputManager::IsKeyDown(DOWN_ARROW_KEY))
-			focus->box.y += speed.y*dt;
-		if(InputManager::IsKeyDown(LEFT_ARROW_KEY))
-			focus->box.x -= speed.x*dt;
-		if(InputManager::IsKeyDown(RIGHT_ARROW_KEY))
-			focus->box.x += speed.x*dt;
 		int w, h;
 		SDL_GetRendererOutputSize(Game::GetInstance().GetRenderer(), &w, &h);
 		pos.x = focus->box.GetCenter().x-w/2;

@@ -11,8 +11,7 @@ Sound::Sound(GameObject& associated, std::string file) : Sound(associated) {
 }
 
 Sound::~Sound() {
-	if(IsPlaying())
-		Mix_HaltChannel(channel);
+	Stop();
 	chunk = nullptr;
 }
 

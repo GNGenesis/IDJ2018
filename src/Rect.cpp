@@ -38,6 +38,16 @@ void Rect::SetSize(Vec2 size) {
 	h = size.y;
 }
 
+void Rect::SetCenter(float x, float y) {
+	Rect::x = x-(w/2);
+	Rect::y = y-(h/2);
+}
+
+void Rect::SetCenter(Vec2 pos) {
+	x = pos.x-(w/2);
+	y = pos.y-(h/2);
+}
+
 bool Rect::Contains(float a, float b) {
 	return((a > x) && (a < x+w) && (b > y) && (b < y+h));
 }
@@ -48,6 +58,10 @@ bool Rect::Contains(Vec2 p) {
 
 Vec2 Rect::GetPos() {
 	return Vec2(x, y);
+}
+
+Vec2 Rect::GetSize() {
+	return Vec2(w, h);
 }
 
 Vec2 Rect::GetCenter() {
