@@ -20,7 +20,7 @@ void Sound::Open(std::string file) {
 }
 
 void Sound::Play(int times) {
-	channel = Mix_PlayChannel(channel, chunk, times-1);
+	channel = Mix_PlayChannel(channel, chunk.get(), times-1);
 	if(channel == -1) {
 		printf("Mix_PlayChannel failed: %s\n", SDL_GetError());
 		exit(EXIT_FAILURE);

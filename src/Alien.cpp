@@ -34,7 +34,7 @@ void Alien::Start() {
 	for(int i = 0; i < nMinions; i++) {
 		GameObject* go = new GameObject();
 		go->AddComponent(new Minion(*go, associated, i*(360/nMinions)));
-		minionArray.push_back(Game::GetInstance().GetState().AddObject(go));
+		minionArray.push_back(Game::GetInstance().GetCurrentState().AddObject(go));
 	}
 }
 
@@ -49,7 +49,7 @@ void Alien::Damage(int damage) {
 		go->AddComponent(sound);
 		go->box.SetCenter(associated.box.GetCenter());
 		go->rotation = rand()%360;
-		Game::GetInstance().GetState().AddObject(go);
+		Game::GetInstance().GetCurrentState().AddObject(go);
 	}
 }
 
@@ -90,16 +90,18 @@ void Alien::Update(float dt) {
 			if(pos.x == dest.x && pos.y == dest.y) {
 				state = RESTING;
 				destination = PenguinBody::player->GetPlayerCenter();
-				int nearestMinion = 0;
-				float minionDS = minionArray[0].lock()->box.GetCenter().GetDS(destination);
-				for(unsigned i = 1; i < minionArray.size(); i++) {
-					if(minionArray[i].lock()->box.GetCenter().GetDS(destination) < minionDS) {
-						nearestMinion = i;
-						minionDS = minionArray[i].lock()->box.GetCenter().GetDS(destination);
+				if(!minionArray.empty()) {
+					int nearestMinion = 0;
+					float minionDS = minionArray[0].lock()->box.GetCenter().GetDS(destination);
+					for(unsigned i = 1; i < minionArray.size(); i++) {
+						if(minionArray[i].lock()->box.GetCenter().GetDS(destination) < minionDS) {
+							nearestMinion = i;
+							minionDS = minionArray[i].lock()->box.GetCenter().GetDS(destination);
+						}
 					}
+					Minion* m = (Minion*) minionArray[nearestMinion].lock()->GetComponent("Minion");
+					m->Shoot(destination);
 				}
-				Minion* m = (Minion*) minionArray[nearestMinion].lock()->GetComponent("Minion");
-				m->Shoot(destination);
 			}
 		}
 	}

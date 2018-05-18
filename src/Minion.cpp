@@ -9,7 +9,7 @@
 #include <time.h>
 
 Minion::Minion(GameObject& associated, GameObject& alienCenter, float arcOffsetDeg) : Component(associated) {
-	Minion::alienCenter = Game::GetInstance().GetState().GetObjectPtr(&alienCenter);
+	Minion::alienCenter = Game::GetInstance().GetCurrentState().GetObjectPtr(&alienCenter);
 	arc = arcOffsetDeg;
 
 	Sprite* sp = new Sprite(associated, "assets/img/minion.png");
@@ -30,7 +30,7 @@ void Minion::Shoot(Vec2 pos) {
 	sprite->SetScale(Vec2(2, 2));
 	go->AddComponentAsFirst(new Bullet(*go, sprite, "Alien", distance, angle, 800, 1));
 	go->box.SetCenter(associated.box.GetCenter());
-	Game::GetInstance().GetState().AddObject(go);
+	Game::GetInstance().GetCurrentState().AddObject(go);
 }
 
 void Minion::Update(float dt) {
@@ -38,12 +38,9 @@ void Minion::Update(float dt) {
 		associated.RequestDelete();
 		GameObject* go = new GameObject();
 		go->AddComponent(new Sprite(*go, "assets/img/miniondeath.png", 4, 0.15, false, 1.5));
-		Sound* sound = new Sound(*go, "assets/audio/boom.wav");
-		sound->Play();
-		go->AddComponent(sound);
 		go->box.SetCenter(associated.box.GetCenter());
 		go->rotation = rand()%360;
-		Game::GetInstance().GetState().AddObject(go);
+		Game::GetInstance().GetCurrentState().AddObject(go);
 	}else{
 		arc += 60*dt;
 		associated.rotation = arc-90;

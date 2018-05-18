@@ -1,17 +1,20 @@
 #include "CameraFollower.h"
 #include "Camera.h"
 
-CameraFollower::CameraFollower(GameObject& associated) : Component(associated) {
-	
+CameraFollower::CameraFollower(GameObject& associated, Vec2 truePos) : Component(associated) {
+	CameraFollower::truePos = truePos;
 }
 
 CameraFollower::~CameraFollower() {
 	
 }
 
+void CameraFollower::SetTruePos(Vec2 pos) {
+	truePos = pos;
+}
+
 void CameraFollower::Update(float dt) {
-	associated.box.x = Camera::pos.x;
-	associated.box.y = Camera::pos.y;
+	associated.box.SetPos(truePos+Camera::pos);
 }
 
 void CameraFollower::Render() {

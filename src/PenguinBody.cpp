@@ -29,8 +29,8 @@ PenguinBody::~PenguinBody() {
 
 void PenguinBody::Start() {
 	GameObject* go = new GameObject();
-	go->AddComponent(new PenguinCannon(*go, Game::GetInstance().GetState().GetObjectPtr(&associated)));
-	pcannon = Game::GetInstance().GetState().AddObject(go);
+	go->AddComponent(new PenguinCannon(*go, Game::GetInstance().GetCurrentState().GetObjectPtr(&associated)));
+	pcannon = Game::GetInstance().GetCurrentState().AddObject(go);
 }
 
 void PenguinBody::Damage(int damage) {
@@ -44,21 +44,21 @@ void PenguinBody::Damage(int damage) {
 		go->AddComponent(sound);
 		go->box.SetCenter(associated.box.GetCenter());
 		go->rotation = rand()%360;
-		Game::GetInstance().GetState().AddObject(go);
+		Game::GetInstance().GetCurrentState().AddObject(go);
 	}
 }
 
 void PenguinBody::Update(float dt) {
 	if(InputManager::IsKeyDown(SDLK_w)) {
-		linearSpeed += 100*dt;
-		if(linearSpeed > 400)
-			linearSpeed = 400;
+		linearSpeed += 200*dt;
+		if(linearSpeed > 600)
+			linearSpeed = 600;
 	}
 	if(InputManager::IsKeyDown(SDLK_a)) {
 		angle -= 180*dt;
 	}
 	if(InputManager::IsKeyDown(SDLK_s)) {
-		linearSpeed -= 100*dt;
+		linearSpeed -= 200*dt;
 		if(linearSpeed < -200)
 			linearSpeed = -200;
 	}
@@ -79,8 +79,10 @@ void PenguinBody::Update(float dt) {
 		}
 	}
 	if(InputManager::IsMouseDown(LEFT_MOUSE_BUTTON)) {
-		PenguinCannon* cannon = (PenguinCannon*) pcannon.lock()->GetComponent("PenguinCannon");
-		cannon->Shoot();
+		if(!pcannon.expired()) {
+			PenguinCannon* cannon = (PenguinCannon*) pcannon.lock()->GetComponent("PenguinCannon");
+			cannon->Shoot();
+		}
 	}
 
 	speed.x = Vec2::Cos(angle)*linearSpeed;

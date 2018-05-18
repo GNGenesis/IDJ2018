@@ -5,8 +5,14 @@
 #include "Game.h"
 #include "Resources.h"
 #include "InputManager.h"
+#include "Camera.h"
 
-Game* Game::instance = nullptr;
+#include <stdlib.h>
+#include <time.h>
+
+Game* Game::instance;
+std::stack<std::unique_ptr<State>> Game::stateStack;
+State* Game::storedState;
 
 Game::Game(std::string title, int width, int height) {
 	if(instance) {
@@ -54,14 +60,20 @@ Game::Game(std::string title, int width, int height) {
 		printf("SDL_CreateRenderer failed: %s\n", SDL_GetError());
 		exit(EXIT_FAILURE);
 	}
-	state = new State();
+
+	//printf((!storedState) ? "OFF\n" : "ON\n");
+	//printf("&%p\n", storedState);
+	//printf((stateStack.empty()) ? "EMPTY\n" : "POPULATED\n");
+
+	srand(time(NULL));
 }
 
 Game::~Game() {
-	delete state;
-	Resources::ClearImages();
-	Resources::ClearMusics();
-	Resources::ClearSounds();
+	if(storedState)
+		delete storedState;
+	while(!stateStack.empty())
+		stateStack.pop();
+	Resources::CleanUp();
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	TTF_Quit();
@@ -70,20 +82,6 @@ Game::~Game() {
 	IMG_Quit();
 	SDL_Quit();
 	printf("We have cleaned it all up now, you can go already.");
-}
-
-Game& Game::GetInstance() {
-	if(!instance)
-		new Game("Gabriel Nazareno Halabi 15/0010290", 1024, 600);
-	return *instance;
-}
-
-SDL_Renderer* Game::GetRenderer() {
-	return renderer;
-}
-
-State& Game::GetState() {
-	return *state;
 }
 
 void Game::CalculateDeltaTime() {
@@ -95,17 +93,58 @@ float Game::GetDeltaTime() {
 	return dt/1000;
 }
 
+Game& Game::GetInstance() {
+	if(!instance) {
+		new Game("Gabriel Nazareno Halabi 15/0010290", 1024, 600);
+	}
+	return *instance;
+}
+
+SDL_Renderer* Game::GetRenderer() {
+	return renderer;
+}
+
+State& Game::GetCurrentState() {
+	return *stateStack.top().get();
+}
+
+void Game::Push(State* state) {
+	storedState = state;
+}
+
 void Game::Run() {
-	state->Start();
-	while(!state->QuitRequested()) {
-		CalculateDeltaTime();
-		if(SDL_RenderClear(renderer))
-			printf("SDL_RenderClear failed: %s\n", SDL_GetError());
-		InputManager::Update();
-		state->Update(GetDeltaTime());
-		state->Render();
-		SDL_RenderPresent(renderer);
-		SDL_Delay(33);
+	if(storedState) {
+		stateStack.emplace(storedState);
+		stateStack.top()->Start();
+		storedState = nullptr;
+	}
+	if(!stateStack.empty()) {
+		while(!stateStack.top()->QuitRequested()) {
+			while(!storedState && !stateStack.top()->PopRequested() && !stateStack.top()->QuitRequested()) {
+				if(SDL_RenderClear(renderer))
+					printf("SDL_RenderClear failed: %s\n", SDL_GetError());
+				CalculateDeltaTime();
+				Camera::Update(GetDeltaTime());
+				InputManager::Update();
+				stateStack.top()->Update(GetDeltaTime());
+				stateStack.top()->Render();
+				SDL_RenderPresent(renderer);
+				SDL_Delay(33);
+			}
+			if(storedState) {
+				stateStack.top()->Pause();
+				stateStack.emplace(storedState);
+				stateStack.top()->Start();
+				storedState = nullptr;
+			}
+			else if(stateStack.top()->PopRequested()) {
+				stateStack.pop();
+				Resources::Clear();
+				if(!stateStack.empty()) {
+					stateStack.top()->Resume();
+				}
+			}
+		}
 	}
 	printf("Game Over.\n");
 }

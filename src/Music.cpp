@@ -20,7 +20,7 @@ void Music::Open(std::string file) {
 }
 
 void Music::Play(int times) {
-	if(Mix_PlayMusic(music, times) == -1) {
+	if(Mix_PlayMusic(music.get(), times) == -1) {
 		printf("Mix_PlayedMusic failed: %s\n", SDL_GetError());
 		exit(EXIT_FAILURE);
 	}

@@ -7,13 +7,16 @@
 #include "State.h"
 
 #include <string>
+#include <stack>
+#include <memory>
 
 class Game {
 private:
 	static Game* instance;
 	SDL_Window* window;
 	SDL_Renderer* renderer;
-	State* state;
+	static std::stack<std::unique_ptr<State>> stateStack;
+	static State* storedState;
 	int frameStart;
 	float dt;
 
@@ -22,10 +25,11 @@ private:
 
 public:
 	~Game();
+	float GetDeltaTime();
 	static Game& GetInstance();
 	SDL_Renderer* GetRenderer();
-	State& GetState();
-	float GetDeltaTime();
+	State& GetCurrentState();
+	void Push(State* state);
 	void Run();
 };
 
